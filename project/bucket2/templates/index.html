@@ -1,0 +1,344 @@
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&amp;display=swap" rel="stylesheet">
+
+    <title>인생 버킷리스트</title>
+
+    <style>
+        * {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        .mypic {
+            width: 100%;
+            height: 200px;
+
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1601024445121-e5b82f020549?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1189&q=80');
+            background-position: center;
+            background-size: cover;
+
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mypic > h1 {
+            font-size: 30px;
+        }
+
+        .mybox {
+            width: 95%;
+            max-width: 700px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px 0px lightblue;
+            margin: 20px auto;
+        }
+
+        .mybucket {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mybucket > input {
+            width: 70%;
+        }
+
+        .mybox > li {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 10px;
+            min-height: 48px;
+        }
+
+        .mybox > li > h2 {
+            max-width: 75%;
+            font-size: 20px;
+            font-weight: 500;
+            margin-right: auto;
+            margin-bottom: 0px;
+        }
+
+        .mybox > li > h2.done {
+            text-decoration: line-through
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            show_bucket();
+        });
+
+        function show_bucket() {
+            $('#bucket-list').empty()
+
+            $.ajax({
+                type: "GET",
+                url: "/bucket",
+                data: {},
+                success: function (response) {
+                    rows = response["buckets"]
+
+                    for(let i=0; i<rows.length; i++){
+                        let bucket = rows[i]['bucket']
+                        let num = rows[i]['num']
+                        let done = rows[i]['done']
+                        let temp_html=``
+
+                        if(done==0){
+                            temp_html=`<li>
+                                            <h2>✅ ${bucket}</h2>
+                                            <button onclick="done_bucket(${num})" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li>`
+                        } else {
+                            temp_html=`<li>
+                                            <h2 class="done">✅ ${bucket}</h2>
+                                            <button onclick="undo_bucket(${num})" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li>`
+                        }
+
+                        $('#bucket-list').append(temp_html)
+                    }
+                }
+            });
+        }
+
+        function save_bucket(){
+
+            let bucket = $('#bucket').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/bucket",
+                data: {bucket_give:bucket},
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            });
+        }
+
+        function delete_bucket(num) {
+
+            $.ajax({
+                type: "POST",
+                url: "/bucket/delete",
+                data: {num_give: num},
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            });
+        }
+
+        function done_bucket(num) {
+
+            $.ajax({
+                type: "POST",
+                url: "/bucket/done",
+                data: {num_give: num},
+                success: function (response) {
+                    alert(response["msg"])
+                }
+            });
+            window.location.reload()
+        }
+
+        function undo_bucket(num){
+            $.ajax({
+                type: "POST",
+                url: "/bucket/undo",
+                data: {num_give: num},
+                success: function (response) {
+                    alert(response["msg"])
+                }
+            });
+            window.location.reload()
+        }
+    </script>
+</head>
+<body>
+<div class="mypic">
+    <h1>나의 버킷리스트</h1>
+</div>
+<div class="mybox">
+    <div class="mybucket">
+        <input id="bucket" class="form-control" type="text" placeholder="이루고 싶은 것을 입력하세요" control-id="ControlID-1">
+        <button onclick="save_bucket()" type="button" class="btn btn-outline-primary" control-id="ControlID-2">기록하기</button>
+    </div>
+</div>
+<div class="mybox" id="bucket-list"><li>
+                                            <h2>✅ 항해99 수료하고 취업 성공하기</h2>
+                                            <button onclick="done_bucket(1)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ 매일 공부한 것 블로그로 정리하기(TIL)</h2>
+                                            <button onclick="undo_bucket(2)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ 입학시험 제한 시간내에 완성하고 제출하기</h2>
+                                            <button onclick="done_bucket(3)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 222</h2>
+                                            <button onclick="done_bucket(4)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 다들 시험문제 보고 계신가요?</h2>
+                                            <button onclick="done_bucket(5)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ 다들 화이팅 입니다!! 합격해서 만나요</h2>
+                                            <button onclick="undo_bucket(6)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2 class="done">✅ 1</h2>
+                                            <button onclick="undo_bucket(7)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ 2</h2>
+                                            <button onclick="done_bucket(8)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ sd</h2>
+                                            <button onclick="done_bucket(9)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 실험</h2>
+                                            <button onclick="done_bucket(10)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ 크리스피 도넛 진짜 맛짱임ㅠ</h2>
+                                            <button onclick="undo_bucket(11)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ 노티드</h2>
+                                            <button onclick="done_bucket(12)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 오우</h2>
+                                            <button onclick="done_bucket(13)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 시험 다들 화이팅입니다!!!</h2>
+                                            <button onclick="done_bucket(14)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ rhksenj</h2>
+                                            <button onclick="done_bucket(15)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ 이 버튼 누르지 마세여</h2>
+                                            <button onclick="undo_bucket(16)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ </h2>
+                                            <button onclick="done_bucket(17)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 합격 축하드립니다</h2>
+                                            <button onclick="done_bucket(18)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ ㅋㅋㅋ 다들 테스트해보시나</h2>
+                                            <button onclick="done_bucket(19)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 모두 화이팅해요!!</h2>
+                                            <button onclick="done_bucket(20)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ ㅋㅋㅋㅋㅋㅋㅋㅋ</h2>
+                                            <button onclick="done_bucket(21)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 다들 화이팅</h2>
+                                            <button onclick="done_bucket(22)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 화이팅입니다.</h2>
+                                            <button onclick="done_bucket(23)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ 렉 걸린 줄</h2>
+                                            <button onclick="undo_bucket(24)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2 class="done">✅ 힘내세용!</h2>
+                                            <button onclick="undo_bucket(25)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ 확인</h2>
+                                            <button onclick="done_bucket(26)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 테스트1</h2>
+                                            <button onclick="done_bucket(27)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 546456654</h2>
+                                            <button onclick="done_bucket(28)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 사랑해요 7기</h2>
+                                            <button onclick="done_bucket(29)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ 옴마나 ㅋㅋㅋㅋ</h2>
+                                            <button onclick="undo_bucket(30)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2 class="done">✅ ㅋㅋㅋㅋ 귀여워 화이팅!!</h2>
+                                            <button onclick="undo_bucket(31)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ 깜짝아 ㅋㅋㅋㅋ</h2>
+                                            <button onclick="done_bucket(32)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ </h2>
+                                            <button onclick="done_bucket(33)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ ㅁㅁ</h2>
+                                            <button onclick="undo_bucket(34)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ 떨리구만유..</h2>
+                                            <button onclick="done_bucket(35)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ dfsd</h2>
+                                            <button onclick="done_bucket(36)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ ㅎㅇㅌ</h2>
+                                            <button onclick="done_bucket(37)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2 class="done">✅ 어케하징</h2>
+                                            <button onclick="undo_bucket(38)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2 class="done">✅ 123</h2>
+                                            <button onclick="undo_bucket(39)" type="button" class="btn btn-outline-danger">취소</button>
+                                        </li><li>
+                                            <h2>✅ 호잇</h2>
+                                            <button onclick="done_bucket(40)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ gd</h2>
+                                            <button onclick="done_bucket(41)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 날이 좋네요</h2>
+                                            <button onclick="done_bucket(42)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 아 취소버튼이 안나온다!!!!!!!!!!!!!!</h2>
+                                            <button onclick="done_bucket(43)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ GOOD!</h2>
+                                            <button onclick="done_bucket(44)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 도와주세요</h2>
+                                            <button onclick="done_bucket(45)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 소리지르지말고 박수추ㅔ</h2>
+                                            <button onclick="done_bucket(46)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 😀😀😀😀😀😀😀😀</h2>
+                                            <button onclick="done_bucket(47)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 여러분 화이팅!!!!</h2>
+                                            <button onclick="done_bucket(48)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 다들 통과후 만나요</h2>
+                                            <button onclick="done_bucket(49)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ </h2>
+                                            <button onclick="done_bucket(50)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 1</h2>
+                                            <button onclick="done_bucket(51)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 화이팅합시다!</h2>
+                                            <button onclick="done_bucket(52)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li><li>
+                                            <h2>✅ 테스트</h2>
+                                            <button onclick="done_bucket(53)" type="button" class="btn btn-outline-primary">완료!</button>
+                                       </li></div>
+
+</body></html>
