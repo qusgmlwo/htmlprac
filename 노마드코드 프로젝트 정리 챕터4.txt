@@ -1,0 +1,99 @@
+쓰인 기능들 정리
+
+input type="text" : type이 text인 값을 입력할 수 있는 공간생성
+
+placeholder : input값을 입력하기전에 input창에 보이는 안내문구
+
+예제 : <input type="text" placeholder="What is your name?" />
+
+button : 클릭할 수 있는 버튼 생성
+
+예제 : <button>Log In</button>
+
+div : 컨텐츠를 분할해준다 css로 꾸미기 전까지는 어떠한 영향도 주지않는다 기능들을 나눌때 쓰임
+
+id : 기능에 이름을 부여해주는 기능
+
+예제 : <div id="login-form">     // div에 login-form 이라는 이름을 달아준것
+
+
+document.querySelector() : html의 클래스 이름 및 태그를 가지고 오기위해서 쓰는 기능
+			대상이 id인지 명확히 해줘야함 classname,tagname 모두 검색 가능하기 때문
+			
+
+예제 : x = document.querySelector("#login-form input");
+
+Document.getElementById() : 주어진 문자열과 일치하는 id 속성을 가진 요소를 찾고 Element 객체를 반환
+
+required : 태그의 required 속성은 폼 데이터(form data)가 서버로 제출되기 전 반드시 채워져 있어야 하는 입력 필드를 명시
+	form안에 있어야함
+
+예제 : <input required type="text" placeholder="What is your name?" />
+
+max/min length : 최대/최소 글자수를 지정 
+		form안에 있어야함
+
+예제 : <input required maxlength="15" type="text" placeholder="What is your name?" />
+
+
+function onLoginSubmit(event){
+event.preventDefault(); // 브라우저가 기본 동작을 실행하지 못하게 막기 // event object는 preventDefault함수를 기본적으로 갖고 있음
+console.log(event);
+}
+
+loginForm.addEventListener("submit", onLoginSubmit); // submit 이벤트가 발생한다면, onLoginSubmit함수를 실행시킨다는 의미
+ // JS는 onLoginSubmit함수 호출시 인자를 담아서 호출함. 해당 인자는 event object를 담은 정보들
+
+★ 중요 ★
+form을 submit하면 브라우저는 기본적으로 페이지를 새로고침 하도록 되어있다. << 우리가 원하는 것이 아님!
+preventDefault() 함수를 추가함으로써 브라우저의 기본 동작을 막을 수 있다!!
+
+
+addEventListener : DOM객체. addEventListener(이벤트명, 실행할 함수명)
+
+
+addEventListener 안에 있는 함수는 직접 실행하지 않는다
+브라우저가 실행시켜주고
+브라우저에서 해당 이벤트에 대한 정보 즉, object를 가지게 된다.
+addEventListener의 함수에서 object에 대한 자리만 할당해주면
+해당 이벤트가 발생시킨 정보들에 대한 object들을 볼 수 있다!
+이때 해당 이벤트가 가진 기본 Default값을 발생시키지 않기 하게 위해선 preventDefault를 이용하여 막을 수 있다!	
+
+
+css 기능 숨기기
+
+.id { display : none;}
+
+className : 태크안에 클래스를 문자열로 리턴해주는 시스템
+
+classList : 태그안에 클래스를 넣어주는 시스템
+
+element.classList.method
+
+예제 : loginForm.classList.add("hidden");  loginForm 안에 hidden이라는 class를 추가하였다.
+
+
+remove : 변수 제거용
+
+greeting.classList.remove(HIDDEN_CLASSNAME) greeting안에 있는 클래스 HIDDEN_CLASSNAME를 제거한다
+
+inner
+
+element.innerText; : elememt안의 text 값들만 가져온다   
+
+element.innerHTML; : innerText와는 달리 innerHTML은 element 안의 HTML이나 XML을 가져옵니다.
+
+` ${element} `  : 다른곳에서 선언된 변수를 가져옴 무조건 `   `  안에 들어와야함
+
+lcoalStorage : 브라우저에 무언가를 저장한 후 나중에 가져 올 수 있음.
+
+lcoalStorage.setItem("username", "nico");
+const savedUsername = localStorage.getItem("username")
+
+
+
+
+
+
+
+
